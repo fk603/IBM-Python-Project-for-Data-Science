@@ -1,0 +1,81 @@
+
+!pip install yfinance
+#!pip install pandas
+!pip install requests
+!pip install bs4
+!pip install plotly
+
+
+import yfinance as yf
+import pandas as pd
+import numpy as np
+import requests
+from bs4 import BeautifulSoup
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+
+def make_graph(stock_data, revenue_data, stock):
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=("Historical Share Price", "Historical Revenue"), vertical_spacing = .3)
+    fig.add_trace(go.Scatter(x=pd.to_datetime(stock_data.Date, infer_datetime_format=True), y=stock_data.Close.astype("float"), name="Share Price"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=pd.to_datetime(revenue_data.Date, infer_datetime_format=True), y=revenue_data.Revenue.astype("float"), name="Revenue"), row=2, col=1)
+    fig.update_xaxes(title_text="Date", row=1, col=1)
+    fig.update_xaxes(title_text="Date", row=2, col=1)
+    fig.update_yaxes(title_text="Price ($US)", row=1, col=1)
+    fig.update_yaxes(title_text="Revenue ($US Millions)", row=2, col=1)
+    fig.update_layout(showlegend=False,
+    height=900,
+    title=stock,
+    xaxis_rangeslider_visible=True)
+    fig.show()
+    
+    
+# Extract Tesla Stock Info using yfinance
+tesla = yf.Ticker("TSLA")
+tesla_data = tesla.history(period="max")
+
+tesla_data.reset_index(inplace=True)
+tesla_data.head()
+   
+
+# Extract Tesla Revenue Data
+url = "https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
+html_data  = requests.get(url).text
+soup = BeautifulSoup(html_data,"html5lib")
+
+tables = soup.find_all('table')[1]
+tesla_revenue = pd.read_html(str(tables))
+tesla_revenue = pd.DataFrame(np.array(df).reshape(48, 2), columns = ['Date','Revenue'])
+tesla_revenue["Revenue"] = tesla_revenue["Revenue"].str.replace("$", "").str.replace(",", "")
+tesla_revenue.head()
+
+tesla_revenue.dropna(inplace=True)
+tesla_revenue.tail()
+
+
+# Extract GameStop Stock Info using yfinance
+gme = yf.Ticker("GME")
+gme_data = gme.history(period="max")
+gme_data.reset_index(inplace=True)
+gme_data.head()
+
+
+# Extract GameStp Revenue Data
+url = "https://www.macrotrends.net/stocks/charts/GME/gamestop/revenue"
+html_data  = requests.get(url).text
+soup = BeautifulSoup(html_data,"html5lib")
+
+tables = soup.find_all('table')[1]
+gme_revenue = pd.read_html(str(tables))
+gme_revenue = pd.DataFrame(np.array(df).reshape(48, 2), columns = ['Date','Revenue'])
+gme_revenue["Revenue"] = gme_revenue["Revenue"].str.replace("$", "").str.replace(",", "")
+gme_revenue.dropna(inplace=True)
+gme_revenue.tail()
+
+
+# Plot Tesla Stock Graph
+make_graph(tesla_data, tesla_revenue, 'Tesla')
+
+
+# Plot GameStop Stock Graph
+make_graph(gme_data, gme_revenue, 'GameStop')
