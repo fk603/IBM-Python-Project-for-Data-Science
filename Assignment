@@ -39,13 +39,13 @@ tesla_data.head()
    
 
 # Extract Tesla Revenue Data
-url = "https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
-html_data  = requests.get(url).text
-soup = BeautifulSoup(html_data,"html5lib")
+url_t = "https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
+html_data_t  = requests.get(url_t).text
+soup_t = BeautifulSoup(html_data,"html5lib")
 
-tables = soup.find_all('table')[1]
-tesla_revenue = pd.read_html(str(tables))
-tesla_revenue = pd.DataFrame(np.array(df).reshape(48, 2), columns = ['Date','Revenue'])
+tables_t = soup_t.find_all('table')[1]
+tesla_revenue = pd.read_html(str(tables_t))
+tesla_revenue = pd.DataFrame(np.array(tesla_revenue).reshape(48, 2), columns = ['Date','Revenue'])
 tesla_revenue["Revenue"] = tesla_revenue["Revenue"].str.replace("$", "").str.replace(",", "")
 tesla_revenue.head()
 
@@ -61,13 +61,13 @@ gme_data.head()
 
 
 # Extract GameStp Revenue Data
-url = "https://www.macrotrends.net/stocks/charts/GME/gamestop/revenue"
-html_data  = requests.get(url).text
-soup = BeautifulSoup(html_data,"html5lib")
+url_g = "https://www.macrotrends.net/stocks/charts/GME/gamestop/revenue"
+html_data_g  = requests.get(url_g).text
+soup_g = BeautifulSoup(html_data_g,"html5lib")
 
-tables = soup.find_all('table')[1]
-gme_revenue = pd.read_html(str(tables))
-gme_revenue = pd.DataFrame(np.array(df).reshape(48, 2), columns = ['Date','Revenue'])
+tables_g = soup_g.find_all('table')[1]
+gme_revenue = pd.read_html(str(tables_g))
+gme_revenue = pd.DataFrame(np.array(gme_revenue).reshape(48, 2), columns = ['Date','Revenue'])
 gme_revenue["Revenue"] = gme_revenue["Revenue"].str.replace("$", "").str.replace(",", "")
 gme_revenue.dropna(inplace=True)
 gme_revenue.tail()
